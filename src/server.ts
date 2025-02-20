@@ -15,6 +15,17 @@ export function buildServer() {
       level: 'info',
       transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
     },
+    ajv: {
+      plugins: [
+        (ajv) => {
+          ajv.addKeyword({
+            keyword: 'example',
+            metaSchema: {},
+            validate: () => true,
+          });
+        },
+      ],
+    },
   });
 
   app.register(cors, {});
@@ -26,23 +37,23 @@ export function buildServer() {
     openapi: {
       openapi: '3.0.0',
       info: {
-        title: 'Fastify Starter API Documentation',
+        title: 'Documentação da API Fastify Starter',
         description: `
-            This API serves as the backend for the Fastify Starter API Template.
+            Esta API serve como backend para o Template da API Fastify Starter.
 
-            It provides the following endpoints:
+            Ela fornece os seguintes endpoints:
             
-            - Health: Check the API's health and database connectivity (/healthcheck)
-            - Authentication: Login and token issuance (/auth/login) 
-            - Player: Create and manage players (/player)
-            - Ranking: Retrieve player rankings with pagination and filters (/ranking)
-            - Monster: Execute authorized monster hunts (/monster-hunt)
+            - Saúde: Verifica a saúde da API e conectividade do banco de dados (/healthcheck)
+            - Autenticação: Login e emissão de token (/auth/login)
+            - Jogador: Cria e gerencia jogadores (/player)
+            - Ranking: Recupera rankings de jogadores com paginação e filtros (/ranking)
+            - Monstro: Executa caçadas autorizadas a monstros (/monster-hunt)
 
-            Built with Fastify, TypeORM, PostgreSQL, and secured with JWT authentication.
+            Construída com Fastify, TypeORM, PostgreSQL e protegida com autenticação JWT.
         `,
         version: '1.0.0',
         contact: {
-          name: 'Support Team',
+          name: 'Equipe de Suporte',
           email: 'support@example.com'
         }
       },
@@ -57,11 +68,11 @@ export function buildServer() {
         }
       ],
       tags: [
-        { name: 'Health', description: 'Endpoints to check API and database connectivity' },
-        { name: 'Authentication', description: 'Endpoints related to user authentication' },
-        { name: 'Player', description: 'Endpoints for player creation and management' },
-        { name: 'Ranking', description: 'Endpoints for fetching player rankings' },
-        { name: 'Monster', description: 'Endpoints for executing monster hunts' }
+        { name: 'Health', description: 'Endpoints para verificar a conectividade da API e banco de dados' },
+        { name: 'Authentication', description: 'Endpoints relacionados à autenticação de usuários' },
+        { name: 'Player', description: 'Endpoints para criação e gerenciamento de jogadores' },
+        { name: 'Ranking', description: 'Endpoints para buscar rankings de jogadores' },
+        { name: 'Monster', description: 'Endpoints para executar caçadas a monstros' }
       ],
       components: {
         securitySchemes: {
@@ -79,13 +90,13 @@ export function buildServer() {
       ],
       externalDocs: {
         url: 'https://swagger.io',
-        description: 'Find more info here'
+        description: 'Encontre mais informações aqui'
       }
     }
   })
 
   app.register(swaggerUi, {
-    routePrefix: '/documentation',
+    routePrefix: '/',
     uiConfig: {
       docExpansion: 'full',
       deepLinking: false,
