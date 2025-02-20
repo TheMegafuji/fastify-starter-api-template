@@ -1,0 +1,37 @@
+# Dependências do Node.js
+node_modules/
+
+# Logs de execução e debug
+*.log
+debug.log
+errors.log
+
+# Arquivos de ambiente (não commitados)
+.env
+
+# Pastas de build e saída compilada
+dist/
+build/
+
+# Cache e arquivos gerados pelo TypeScript
+*.tsbuildinfo
+
+# Diretórios de cobertura de testes
+coverage/
+.nyc_output/
+
+# Arquivos gerados pelo sistema operacional
+.DS_Store
+Thumbs.db
+
+# Pastas de configuração de editores
+.vscode/
+.idea/
+
+# Pasta de saída do Swagger
+swagger-output/
+
+# Arquivos usados para IA
+output.md
+promptInicial.md
+generate_prompt.py
