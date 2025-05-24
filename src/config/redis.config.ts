@@ -1,13 +1,19 @@
-import Redis from 'ioredis';
+import { CacheService } from '../services/cache.service';
+import { connect as connectDB, disconnect as disconnectDB } from './db.config';
 
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+export let cacheService: CacheService;
 
-export const redisClient = new Redis(redisUrl);
+export async function initializeConnections() {
+  cacheService = new CacheService();
+  await cacheService.connect();
 
-redisClient.on('connect', () => {
-    console.log('Connected to Redis');
-});
+  await connectDB();
+}
 
-redisClient.on('error', (err) => {
-    console.error('Redis error:', err);
-});
+export async function disconnectConnections() {
+  if (cacheService) {
+    await cacheService.disconnect();
+  }
+
+  await disconnectDB();
+}

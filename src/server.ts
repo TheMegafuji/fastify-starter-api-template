@@ -6,7 +6,7 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import { errorHandler } from './plugins/errorHandler';
 import routes from './routes';
-import { connect, disconnect } from './config/db.config';
+import { initializeConnections, disconnectConnections, cacheService } from './config/redis.config';
 
 
 export function buildServer() {
@@ -31,7 +31,12 @@ export function buildServer() {
   app.register(cors, {});
   app.register(helmet, { contentSecurityPolicy: false });
 
-  app.register(rateLimit, { max: 100, timeWindow: '1 minute' });
+  app.register(rateLimit, { 
+    max: 100, 
+    timeWindow: '1 minute',
+    redis: process.env.RATE_LIMIT_REDIS_URL ? undefined : cacheService,
+    skipOnError: true
+  });
 
   app.register(swagger, {
     openapi: {
@@ -106,8 +111,8 @@ export function buildServer() {
   });
 
   app.addHook('onReady', async () => {
-    await connect();
-    app.log.info('Database connected via onReady hook');
+    await initializeConnections();
+    app.log.info('Database and cache services connected via onReady hook');
   });
 
   app.setErrorHandler(errorHandler);
@@ -121,6 +126,11 @@ export function buildServer() {
 export default buildServer();
 
 process.on('SIGINT', async () => {
-  await disconnect();
+  await disconnectConnections();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  await disconnectConnections();
   process.exit(0);
 });

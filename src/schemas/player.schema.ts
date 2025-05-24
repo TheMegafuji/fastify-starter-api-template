@@ -7,6 +7,14 @@ export const CreatePlayerBodySchema = Type.Object({
     password: Type.String({ minLength: 6, description: 'Senha do jogador', example: 'senha123' }),
 });
 
+export const GetPlayerParamsSchema = Type.Object({
+    id: Type.String({ 
+        description: 'ID do jogador', 
+        example: '1',
+        pattern: '^[0-9]+$'
+    }),
+});
+
 export const PlayerResponseSchema = Type.Object({
     id: Type.Number({ example: 1 }),
     discordId: Type.String({ example: 'discord-id' }),
@@ -15,4 +23,8 @@ export const PlayerResponseSchema = Type.Object({
     gold: Type.Number({ example: 0 }),
     email: Type.String({ format: 'email', example: 'player@example.com' }),
     level: Type.Number({ example: 1 }),
+});
+
+export const ErrorResponseSchema = Type.Object({
+    message: Type.String({ example: 'Error message' })
 });

@@ -16,3 +16,14 @@ export async function createPlayer(playerData: Partial<PlayerEntity>): Promise<P
     const { password, ...playerWithoutPassword } = savedPlayer;
     return playerWithoutPassword;
 }
+
+export async function getPlayerById(id: number): Promise<Partial<PlayerEntity> | null> {
+    const player = await PlayerRepository.findOne({ where: { id } });
+    
+    if (!player) {
+        return null;
+    }
+    
+    const { password, ...playerWithoutPassword } = player;
+    return playerWithoutPassword;
+}
