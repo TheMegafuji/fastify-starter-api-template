@@ -1,0 +1,135 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Workflow & Setup
+
+## Environment Setup
+
+### Prerequisites
+- **Node.js** (version specified in [package.json](mdc:package.json))
+- **PostgreSQL** database
+- **npm** for package management
+
+### Local Development Setup
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Environment configuration**: 
+   - Copy [.env.example](mdc:.env.example) to `.env`
+   - Configure required variables:
+     ```
+     PORT=5000
+     DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+     JWT_SECRET=your-secret-key
+     ```
+
+3. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+   - Uses `tsx watch` for hot reloading
+   - Entry point: [src/local.ts](mdc:src/local.ts)
+   - Server runs on port 5000 by default
+
+## Development Commands
+
+### Core Development
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build for production (Vercel)
+- `npm run start` - Start production server
+
+### Database Operations
+- `npm run migration:run` - Execute pending TypeORM migrations
+- `npm run migration:revert` - Revert last migration
+- Migrations stored in [src/migrations/](mdc:src/migrations)
+
+### Code Quality
+- `npm run format` - Format code with Prettier
+- `npm test` - Run Jest test suite
+- Configuration: [.prettierrc](mdc:.prettierrc), [jest.config.js](mdc:jest.config.js)
+
+## Adding New Features
+
+### 1. Create Entity (if needed)
+- Add new TypeORM entity in [src/entities/](mdc:src/entities)
+- Follow existing [Player.ts](mdc:src/entities/Player.ts) pattern
+- Use decorators for table/column definitions
+
+### 2. Create Repository
+- Add repository in [src/repositories/](mdc:src/repositories)
+- Extend TypeORM repository pattern
+- Handle database operations
+
+### 3. Create Service
+- Add business logic in [src/services/](mdc:src/services)
+- Import and use repository
+- Keep controllers thin, services fat
+
+### 4. Create Schema
+- Define TypeBox schemas in [src/schemas/](mdc:src/schemas)
+- Include request/response validation
+- Add examples for documentation
+
+### 5. Create Controller
+- Add controller in [src/controllers/](mdc:src/controllers)
+- Handle HTTP logic only
+- Call services for business logic
+
+### 6. Create Routes
+- Add routes in [src/routes/](mdc:src/routes)
+- Register with schemas and controllers
+- Update [src/routes/index.ts](mdc:src/routes/index.ts)
+
+### 7. Add Documentation
+- Create docs in [src/docs/](mdc:src/docs)
+- Define Swagger/OpenAPI specs
+- Include examples and descriptions
+
+### 8. Write Tests
+- Add integration tests in [__tests__/](mdc:__tests__)
+- Use Supertest for HTTP testing
+- Follow `{feature}.test.ts` naming
+
+## Configuration Files
+
+### TypeScript Configuration
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript compiler options
+- Experimental decorators enabled for TypeORM
+- Custom type definitions in [src/types/](mdc:src/types)
+
+### Database Configuration
+- Connection setup in [src/config/db.config.ts](mdc:src/config/db.config.ts)
+- Entity registration and migration paths
+- SSL and connection pooling options
+
+### Deployment Configuration
+- [Dockerfile](mdc:Dockerfile) - Docker containerization
+- [vercel.json](mdc:vercel.json) - Vercel serverless deployment
+- Build output to `./build` directory
+
+## Best Practices
+
+### Code Organization
+- Follow the layered architecture pattern
+- Keep related files together by feature
+- Use consistent naming conventions
+
+### Authentication
+- Always protect sensitive endpoints with JWT
+- Use the auth plugin from [src/plugins/auth.ts](mdc:src/plugins/auth.ts)
+- Handle unauthorized access gracefully
+
+### Error Handling
+- Use the centralized error handler in [src/plugins/errorHandler.ts](mdc:src/plugins/errorHandler.ts)
+- Return consistent error response formats
+- Log errors appropriately for debugging
+
+### Testing
+- Write integration tests for all endpoints
+- Mock external dependencies when necessary
+- Maintain good test coverage

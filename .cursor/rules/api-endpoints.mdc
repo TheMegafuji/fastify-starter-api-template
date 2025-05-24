@@ -1,0 +1,67 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# API Endpoints Guide
+
+This backend provides a gaming-focused API with player management, authentication, and monster hunting features.
+
+## Health Check
+- **GET /healthcheck** - Check API and database connectivity
+  - Route: [src/routes/healthcheck.routes.ts](mdc:src/routes/healthcheck.routes.ts)
+  - Controller: [src/controllers/healthcheck.controller.ts](mdc:src/controllers/healthcheck.controller.ts)
+  - Schema: [src/schemas/healthcheck.schema.ts](mdc:src/schemas/healthcheck.schema.ts)
+
+## Authentication
+- **POST /auth/login** - Authenticate player and get JWT token
+  - Route: [src/routes/auth.routes.ts](mdc:src/routes/auth.routes.ts)
+  - Controller: [src/controllers/auth.controller.ts](mdc:src/controllers/auth.controller.ts)
+  - Schema: [src/schemas/auth.schema.ts](mdc:src/schemas/auth.schema.ts)
+  - **Public endpoint** - No authentication required
+
+## Player Management
+- **POST /player** - Create new player account
+  - Route: [src/routes/player.routes.ts](mdc:src/routes/player.routes.ts)
+  - Controller: [src/controllers/player.controller.ts](mdc:src/controllers/player.controller.ts)
+  - Schema: [src/schemas/player.schema.ts](mdc:src/schemas/player.schema.ts)
+  - Service: [src/services/player.service.ts](mdc:src/services/player.service.ts)
+  - **Public endpoint** - Registration is open
+
+## Ranking System
+- **GET /ranking** - Get paginated player rankings
+  - Route: [src/routes/ranking.routes.ts](mdc:src/routes/ranking.routes.ts)
+  - Controller: [src/controllers/ranking.controller.ts](mdc:src/controllers/ranking.controller.ts)
+  - Schema: [src/schemas/ranking.schema.ts](mdc:src/schemas/ranking.schema.ts)
+  - Service: [src/services/ranking.service.ts](mdc:src/services/ranking.service.ts)
+  - **Features**: Pagination, filtering, sorting by level/gold/XP
+  - **Protected endpoint** - Requires JWT authentication
+
+## Monster Hunt (Gameplay)
+- **POST /monster-hunt** - Execute monster hunting action
+  - Route: [src/routes/monster.routes.ts](mdc:src/routes/monster.routes.ts)
+  - Controller: [src/controllers/monster.controller.ts](mdc:src/controllers/monster.controller.ts)
+  - Schema: [src/schemas/monster.schema.ts](mdc:src/schemas/monster.schema.ts)
+  - Service: [src/services/monster.service.ts](mdc:src/services/monster.service.ts)
+  - **Features**: XP gain, gold rewards, level progression
+  - **Protected endpoint** - Requires JWT authentication
+
+## Swagger Documentation
+- **GET /** - Interactive API documentation
+  - Configured in [src/server.ts](mdc:src/server.ts)
+  - Documentation definitions in [src/docs/](mdc:src/docs) directory
+  - **Public access** - No authentication required
+
+## Authentication Requirements
+- **Public endpoints**: `/healthcheck`, `/auth/login`, `/player` (POST), `/` (docs)
+- **Protected endpoints**: `/ranking`, `/monster-hunt`
+- **Authentication method**: Bearer JWT token in Authorization header
+- **Token obtained from**: `/auth/login` endpoint
+
+## Rate Limiting
+- All endpoints have **100 requests per minute** limit per IP
+- Configured in [src/server.ts](mdc:src/server.ts) via `@fastify/rate-limit`
+
+## Testing Coverage
+- Monster hunt endpoints tested in [__tests__/monster.test.ts](mdc:__tests__/monster.test.ts)
+- Ranking endpoints tested in [__tests__/ranking.test.ts](mdc:__tests__/ranking.test.ts)

@@ -1,0 +1,170 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Troubleshooting Guide
+
+## Common Issues & Solutions
+
+### Database Connection Issues
+
+**Problem**: Database connection fails
+**Check these files**:
+- [src/config/db.config.ts](mdc:src/config/db.config.ts) - Connection configuration
+- [.env](mdc:.env) - Database URL and credentials
+
+**Solutions**:
+1. Verify `DATABASE_URL` format: `postgresql://user:password@host:port/database`
+2. Check PostgreSQL server is running
+3. Verify database exists and credentials are correct
+4. Check SSL settings if using remote database
+
+### Migration Issues
+
+**Problem**: Migration errors or outdated schema
+**Commands**:
+```bash
+npm run migration:run    # Apply pending migrations
+npm run migration:revert # Rollback last migration
+```
+
+**Check**: [src/migrations/](mdc:src/migrations) directory for migration files
+
+### JWT Authentication Problems
+
+**Problem**: Token validation fails
+**Check these files**:
+- [src/plugins/auth.ts](mdc:src/plugins/auth.ts) - Authentication plugin
+- [.env](mdc:.env) - JWT_SECRET configuration
+
+**Debug steps**:
+1. Verify `JWT_SECRET` is set in environment
+2. Check token format in Authorization header: `Bearer <token>`
+3. Ensure token is obtained from `/auth/login` endpoint
+4. Check token expiration
+
+### TypeBox Schema Validation Errors
+
+**Problem**: Request validation fails
+**Check these files**:
+- [src/schemas/](mdc:src/schemas) - Schema definitions
+- [src/server.ts](mdc:src/server.ts) - Fastify AJV configuration
+
+**Common fixes**:
+1. Verify request body matches schema exactly
+2. Check required vs optional fields
+3. Validate data types (string, number, object)
+4. Check format constraints (email, minLength, etc.)
+
+### Hot Reload Issues
+
+**Problem**: Development server not reloading
+**Solutions**:
+1. Restart development server: `npm run dev`
+2. Check [src/local.ts](mdc:src/local.ts) entry point
+3. Verify `tsx watch` is working properly
+4. Clear Node.js cache if needed
+
+### Port Already in Use
+
+**Problem**: Cannot bind to port 5000
+**Solutions**:
+1. Change PORT in [.env](mdc:.env) file
+2. Kill existing process: 
+   ```bash
+   lsof -ti:5000 | xargs kill -9  # macOS/Linux
+   netstat -ano | findstr :5000   # Windows
+   ```
+
+### Test Failures
+
+**Problem**: Jest tests failing
+**Check these files**:
+- [jest.config.js](mdc:jest.config.js) - Test configuration
+- [__tests__/](mdc:__tests__) - Test files
+
+**Debug steps**:
+1. Run tests with verbose output: `npm test -- --verbose`
+2. Check database connection for integration tests
+3. Verify test data setup and cleanup
+4. Check mock configurations
+
+### TypeScript Compilation Errors
+
+**Problem**: TS compilation fails
+**Check these files**:
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration
+- [src/types/](mdc:src/types) - Custom type definitions
+
+**Solutions**:
+1. Verify all imports are correct
+2. Check TypeORM decorator usage
+3. Ensure experimental decorators are enabled
+4. Update type definitions if needed
+
+### Swagger Documentation Issues
+
+**Problem**: API docs not displaying correctly
+**Check these files**:
+- [src/docs/](mdc:src/docs) - Documentation definitions
+- [src/server.ts](mdc:src/server.ts) - Swagger configuration
+
+**Access**: http://localhost:5000/documentation
+
+### Rate Limiting Issues
+
+**Problem**: Too many requests error
+**Check**: [src/server.ts](mdc:src/server.ts) rate limit configuration
+**Current limit**: 100 requests per minute per IP
+
+### Plugin Registration Errors
+
+**Problem**: Fastify plugin registration fails
+**Check these files**:
+- [src/plugins/](mdc:src/plugins) - Plugin implementations
+- [src/server.ts](mdc:src/server.ts) - Plugin registration order
+
+**Note**: Plugin registration order matters in Fastify
+
+## Debugging Tools
+
+### Development Logging
+- **Pino logger** with pretty printing in development
+- **Log levels**: Configure in [src/server.ts](mdc:src/server.ts)
+- **Log files**: Check `debug.log` and `errors.log`
+
+### Database Debugging
+- **TypeORM logging**: Enable in [src/config/db.config.ts](mdc:src/config/db.config.ts)
+- **Query logging**: Set `logging: true` in database config
+
+### API Testing
+- **Swagger UI**: Interactive testing at `/documentation`
+- **Supertest**: For automated endpoint testing
+- **cURL/Postman**: Manual API testing
+
+## Performance Issues
+
+### High Memory Usage
+1. Check for memory leaks in services
+2. Review database connection pooling
+3. Monitor TypeORM query efficiency
+
+### Slow Response Times
+1. Add database indexes for frequent queries
+2. Review N+1 query problems
+3. Check rate limiting configuration
+4. Optimize business logic in services
+
+## Environment-Specific Issues
+
+### Development vs Production
+- Different logging configurations
+- Database SSL requirements
+- Environment variable differences
+- Build vs development entry points
+
+### Docker Issues
+- Check [Dockerfile](mdc:Dockerfile) configuration
+- Verify environment variables in container
+- Database connectivity from container

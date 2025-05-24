@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Backend - Project Overview
+
+This is a **Fastify-based API backend** called mega-backend-template that follows a modular, scalable architecture. The project uses **TypeScript**, **TypeORM**, **PostgreSQL**, and **JWT authentication**.
+
+## Core Technologies
+- **[Fastify](mdc:https:/www.fastify.io)** - High-performance web framework
+- **[TypeORM](mdc:https:/typeorm.io)** - ORM for database operations  
+- **[PostgreSQL](mdc:https:/www.postgresql.org)** - Primary database
+- **[@sinclair/typebox](mdc:https:/github.com/sinclairzx81/typebox)** - Schema validation
+- **[JWT](mdc:https:/jwt.io)** - Authentication system
+
+## Project Architecture
+
+The project follows a **layered architecture** with clear separation of concerns:
+
+### Entry Points
+- **[src/server.ts](mdc:src/server.ts)** - Main Fastify server configuration and setup
+- **[src/local.ts](mdc:src/local.ts)** - Local development entry point
+- **[package.json](mdc:package.json)** - Project dependencies and scripts
+
+### Core Layers
+1. **Routes** ([src/routes/](mdc:src/routes)) - HTTP endpoint definitions
+2. **Controllers** ([src/controllers/](mdc:src/controllers)) - Request/response handling logic
+3. **Services** ([src/services/](mdc:src/services)) - Business logic implementation
+4. **Repositories** ([src/repositories/](mdc:src/repositories)) - Data access layer
+5. **Entities** ([src/entities/](mdc:src/entities)) - TypeORM data models
+
+### Supporting Components
+- **Schemas** ([src/schemas/](mdc:src/schemas)) - Input/output validation using TypeBox
+- **Plugins** ([src/plugins/](mdc:src/plugins)) - Custom Fastify plugins (auth, error handling)
+- **Config** ([src/config/](mdc:src/config)) - Database, Redis, AWS configurations
+- **Docs** ([src/docs/](mdc:src/docs)) - Swagger documentation definitions
+
+## Key Features
+- **Gaming/Player Management** - Player creation, ranking system
+- **Monster Hunt System** - Gameplay mechanics with XP/gold progression
+- **JWT Authentication** - Protected endpoints with bearer tokens
+- **Rate Limiting** - API protection (100 requests/minute)
+- **Swagger Documentation** - Interactive API docs at `/documentation`
+- **Database Migrations** - TypeORM migration system
+- **Testing** - Jest test suite in [__tests__/](mdc:__tests__)
+
+## Development Commands
+- `npm run dev` - Development server with hot reload
+- `npm test` - Run Jest tests
+- `npm run migration:run` - Execute database migrations
+- `npm run format` - Format code with Prettier
+
+## Deployment
+- **Docker** - [Dockerfile](mdc:Dockerfile) for containerization
+- **Vercel** - Serverless deployment via [vercel.json](mdc:vercel.json)

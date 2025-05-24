@@ -1,0 +1,73 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Architecture Patterns & Conventions
+
+## Request Flow Pattern
+All API requests follow this consistent flow:
+
+1. **Route** ([src/routes/](mdc:src/routes)) - Defines endpoint and HTTP method
+2. **Schema** ([src/schemas/](mdc:src/schemas)) - Validates request/response using TypeBox
+3. **Controller** ([src/controllers/](mdc:src/controllers)) - Handles HTTP logic, calls services
+4. **Service** ([src/services/](mdc:src/services)) - Contains business logic
+5. **Repository** ([src/repositories/](mdc:src/repositories)) - Database operations via TypeORM
+6. **Entity** ([src/entities/](mdc:src/entities)) - Database models
+
+## File Naming Conventions
+- **Routes**: `{feature}.routes.ts` (e.g., `auth.routes.ts`)
+- **Controllers**: `{feature}.controller.ts` (e.g., `player.controller.ts`)
+- **Services**: `{feature}.service.ts` (e.g., `monster.service.ts`)
+- **Schemas**: `{feature}.schema.ts` (e.g., `ranking.schema.ts`)
+- **Entities**: `{ModelName}.ts` (e.g., `Player.ts`)
+- **Docs**: `{feature}.doc.ts` (e.g., `healthcheck.doc.ts`)
+
+## TypeBox Schema Pattern
+Schemas use `@sinclair/typebox` for validation. Key patterns:
+
+```typescript
+// Request/Response definitions
+export const CreatePlayerRequest = Type.Object({
+  name: Type.String({ minLength: 1 }),
+  email: Type.String({ format: 'email' })
+});
+
+export const PlayerResponse = Type.Object({
+  id: Type.Number(),
+  name: Type.String(),
+  level: Type.Number()
+});
+```
+
+## Fastify Route Registration
+Routes are modularized and registered in [src/routes/index.ts](mdc:src/routes/index.ts):
+
+```typescript
+// Each feature has its own route file
+app.register(authRoutes, { prefix: '/auth' });
+app.register(playerRoutes, { prefix: '/player' });
+```
+
+## Authentication Pattern
+- **JWT tokens** issued via `/auth/login`
+- **Bearer authentication** required for protected endpoints
+- **Auth plugin** ([src/plugins/auth.ts](mdc:src/plugins/auth.ts)) handles token validation
+- **User info** attached to request via `request.user`
+
+## Error Handling
+- **Centralized error handler** in [src/plugins/errorHandler.ts](mdc:src/plugins/errorHandler.ts)
+- **HTTP status codes** and consistent error responses
+- **Fastify error hooks** for automatic error processing
+
+## Database Patterns
+- **TypeORM entities** with decorators for table definitions
+- **Repository pattern** for data access abstraction
+- **Migration system** for database schema changes
+- **Connection management** via [src/config/db.config.ts](mdc:src/config/db.config.ts)
+
+## Testing Strategy
+- **Integration tests** in [__tests__/](mdc:__tests__) directory
+- **Supertest** for HTTP endpoint testing
+- **Jest** as the test runner
+- Tests follow `{feature}.test.ts` naming pattern
