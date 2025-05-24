@@ -1,11 +1,11 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # API Endpoints Guide
 
-This backend provides a gaming-focused API with player management, authentication, and monster hunting features.
+This backend provides a API with player management, authentication, and monster hunting features.
 
 ## Health Check
 - **GET /healthcheck** - Check API and database connectivity

@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # Troubleshooting Guide
 
@@ -15,10 +15,28 @@ alwaysApply: true
 - [.env](mdc:.env) - Database URL and credentials
 
 **Solutions**:
-1. Verify `DATABASE_URL` format: `postgresql://user:password@host:port/database`
-2. Check PostgreSQL server is running
-3. Verify database exists and credentials are correct
-4. Check SSL settings if using remote database
+1. **Option 1 - Complete URLs**: Verify `DATABASE_URL_WRITE` and `DATABASE_URL_READ` format: `postgres://user:password@host:port/database`
+2. **Option 2 - Individual variables**: Check `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+3. Check PostgreSQL server is running
+4. Verify database exists and credentials are correct
+5. Check SSL settings: Set `DB_SSL=true` if using remote database
+6. Verify connection pool: Adjust `DB_MAX_CONNECTION` if needed (default: 10)
+
+**Environment Variables to check**:
+```bash
+# Database URLs (Option 1)
+DATABASE_URL_WRITE=postgres://user:password@host:port/database
+DATABASE_URL_READ=postgres://user:password@host:port/database
+
+# Individual variables (Option 2)
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=your_database
+DB_SSL=true|false
+DB_MAX_CONNECTION=10
+```
 
 ### Migration Issues
 

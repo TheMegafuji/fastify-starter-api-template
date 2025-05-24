@@ -23,9 +23,55 @@ alwaysApply: true
    - Copy [.env.example](mdc:.env.example) to `.env`
    - Configure required variables:
      ```
+     # Server Configuration
      PORT=5000
-     DATABASE_URL=postgresql://user:password@localhost:5432/dbname
-     JWT_SECRET=your-secret-key
+     NODE_ENV=development|production|homolog
+
+     # Database - Option 1: Complete URLs
+     DATABASE_URL_WRITE=postgres://user:password@host:port/database
+     DATABASE_URL_READ=postgres://user:password@host:port/database
+
+     # Database - Option 2: Individual variables
+     DB_HOST=localhost
+     DB_PORT=5432
+     DB_USER=root
+     DB_PASSWORD=your_password
+     DB_NAME=your_database
+     DB_SSL=true|false
+     DB_MAX_CONNECTION=10
+
+     # Redis and Cache
+     REDIS_URL=redis://localhost:6379
+     UPSTASH_REDIS_REST_URL=
+     UPSTASH_REDIS_REST_TOKEN=
+
+     # AWS Services (Optional)
+     AWS_REGION=
+     AWS_ACCESS_KEY_ID=
+     AWS_SECRET_ACCESS_KEY=
+
+     # JWT & API Security
+     JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-random
+     API_SECRET_KEY=your-api-secret-key-for-additional-security
+
+     # Clerk Integration (Authentication)
+     CLERK_SECRET_KEY=sk_test_...
+     CLERK_WEBHOOK_SECRET=whsec_...
+     CLERK_PUBLISHABLE_KEY=pk_test_...
+
+     # Rate Limiting
+     RATE_LIMIT_REDIS_URL=redis://localhost:6379
+
+     # External Services
+     STRIPE_SECRET_KEY=sk_test_...
+     STRIPE_WEBHOOK_SECRET=whsec_...
+
+     # Logging
+     LOG_LEVEL=info
+     APP_NAME=your_app_name
+
+     # CORS
+     CORS_ORIGIN=http://localhost:3000,https://yourdomain.com
      ```
 
 3. **Start development server**:

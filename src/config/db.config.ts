@@ -1,19 +1,22 @@
 import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import pino from 'pino';
+import logger from './logger';
+
+const isTestEnv =
+  process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'homolog';
 
 const MAX_RETRIES = 5;
-const isTestEnv = process.env.NODE_ENV === 'development';
-
-const logger = pino();
-
-const baseDbConfig: Partial<DataSourceOptions> = {
+const baseConfig: Partial<DataSourceOptions> = {
   type: 'postgres',
   entities: [__dirname + '/../entities/*.{js,ts}'],
-  synchronize: isTestEnv ? true : false,
   migrations: [__dirname + '/../migrations/*.{js,ts}'],
-  logging: false,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
+  synchronize: isTestEnv ? false : false,
+  ssl:
+    process.env.DB_SSL === 'true'
+      ? {
+        rejectUnauthorized: false,
+      }
+      : false,
   extra: {
     max: Number(process.env.DB_MAX_CONNECTION) || 10,
     connectionTimeoutMillis: 60000,
@@ -22,72 +25,134 @@ const baseDbConfig: Partial<DataSourceOptions> = {
   },
 };
 
-let connectionOptions: DataSourceOptions;
+function parseDatabaseUrl(url: string) {
+  try {
+    const withoutProtocol = url.replace('postgres://', '');
 
-if (process.env.DATABASE_URL) {
-  const matches = process.env.DATABASE_URL.match(/postgres:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
-  
-  if (!matches) {
-    throw new Error('Invalid DATABASE_URL format');
+    const [auth, serverPart] = withoutProtocol.split('@');
+
+    const [username, password] = auth.split(':');
+
+    let host, port, database;
+    if (serverPart.includes(':')) {
+      const [hostPort, db] = serverPart.split('/');
+      const [hostPart, portPart] = hostPort.split(':');
+      host = hostPart;
+      port = parseInt(portPart, 10);
+      database = db;
+    } else {
+      const [hostPart, db] = serverPart.split('/');
+      host = hostPart;
+      port = 5432;
+      database = db;
+    }
+
+    return {
+      host,
+      port,
+      username,
+      password,
+      database,
+    };
+  } catch (error) {
+    throw new Error(
+      `Falha ao analisar a URL do banco de dados: ${error.message}`
+    );
   }
+}
 
-  const [, username, password, host, port, database] = matches;
-
-  connectionOptions = {
-    ...baseDbConfig,
-    host,
-    port: parseInt(port),
-    username,
-    password,
-    database,
-  } as DataSourceOptions;
-} else {
-  connectionOptions = {
-    ...baseDbConfig,
+const writeConfig = process.env.DATABASE_URL_WRITE
+  ? { ...baseConfig, ...parseDatabaseUrl(process.env.DATABASE_URL_WRITE) }
+  : {
+    ...baseConfig,
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT) || 5432,
     username: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'test',
-  } as DataSourceOptions;
+  };
+
+const readConfig = process.env.DATABASE_URL_READ
+  ? { ...baseConfig, ...parseDatabaseUrl(process.env.DATABASE_URL_READ) }
+  : writeConfig;
+
+export const WriteDataSource = new DataSource(writeConfig as DataSourceOptions);
+export const ReadDataSource = new DataSource(readConfig as DataSourceOptions);
+export const connectionSource = WriteDataSource;
+
+async function connectWithRetry(
+  dataSource: DataSource,
+  name: string,
+  maxRetries = MAX_RETRIES,
+  delay = 5000
+) {
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    try {
+      if (!dataSource.isInitialized) {
+        await dataSource.initialize();
+        logger.info(`${name} Database connected successfully`);
+        return true;
+      }
+      return true;
+    } catch (error) {
+      retries++;
+      logger.warn(
+        {
+          error: {
+            message: error.message,
+            code: error.code,
+          },
+          retries,
+          maxRetries,
+        },
+        `Failed to connect to ${name} Database. Retrying in ${delay}ms...`
+      );
+
+      if (retries >= maxRetries) {
+        logger.error(
+          `Maximum retries (${maxRetries}) reached for ${name} Database`
+        );
+        throw error;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
 }
 
-export const connectionSource = new DataSource(connectionOptions);
-
-
-export async function connect(retries = MAX_RETRIES): Promise<void> {
-    try {
-        if (!connectionSource.isInitialized) {
-            await connectionSource.initialize();
-            logger.info('Database connection established');
-        }
-    } catch (error) {
-        logger.error('Error connecting to the database:', {
-            error: error instanceof Error ? error.message : String(error),
-            database: connectionOptions.database
-        });
-
-        if (retries > 0) {
-            logger.info(`Retrying connection in 5 seconds... (Attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);
-            await new Promise((res) => setTimeout(res, 5000));
-            return connect(retries - 1);
-        }
-        
-        logger.fatal('Maximum retry attempts reached. Unable to establish database connection.');
-        throw error;
-    }
+export async function connect() {
+  try {
+    await connectWithRetry(WriteDataSource, 'Write');
+    await connectWithRetry(ReadDataSource, 'Read');
+  } catch (error) {
+    logger.error(
+      {
+        error: {
+          message: error.message,
+          stack: error.stack,
+          code: error.code,
+          detail: error.detail,
+        },
+      },
+      'Error connecting to database'
+    );
+    throw error;
+  }
 }
 
 export async function disconnect() {
-    try {
-        await connectionSource.destroy();
-        logger.debug('Database connection closed');
-    } catch (error) {
-        logger.error('Error closing database connection:', error);
-    }
+  try {
+    if (WriteDataSource.isInitialized) await WriteDataSource.destroy();
+    if (ReadDataSource.isInitialized) await ReadDataSource.destroy();
+    logger.info('Databases disconnected');
+  } catch (error) {
+    logger.error('Error disconnecting databases', error);
+  }
 }
 
 process.on('SIGINT', async () => {
-    await disconnect();
-    process.exit(0);
+  await disconnect();
+  process.exit(0);
 });

@@ -1,0 +1,225 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Environment Variables Reference
+
+Este documento lista todas as variáveis de ambiente disponíveis no projeto, baseadas no arquivo `env.example`.
+
+## 🚀 Server Configuration
+
+### `PORT`
+- **Descrição**: Porta na qual o servidor será executado
+- **Tipo**: Number
+- **Padrão**: `5000`
+- **Exemplo**: `PORT=5000`
+
+### `NODE_ENV`
+- **Descrição**: Ambiente de execução da aplicação
+- **Tipo**: String
+- **Valores**: `development`, `production`, `homolog`
+- **Padrão**: `development`
+- **Exemplo**: `NODE_ENV=development`
+
+## 🗄️ Database Configuration
+
+O projeto suporta duas formas de configuração de banco de dados:
+
+### Opção 1: URLs Completas (Recomendado)
+
+#### `DATABASE_URL_WRITE`
+- **Descrição**: URL completa para conexão de escrita no banco
+- **Tipo**: String
+- **Formato**: `postgres://user:password@host:port/database`
+- **Exemplo**: `DATABASE_URL_WRITE=postgres://user:password@localhost:5432/mydb`
+
+#### `DATABASE_URL_READ`
+- **Descrição**: URL completa para conexão de leitura no banco
+- **Tipo**: String
+- **Formato**: `postgres://user:password@host:port/database`
+- **Padrão**: Usa a mesma configuração do `DATABASE_URL_WRITE`
+- **Exemplo**: `DATABASE_URL_READ=postgres://user:password@localhost:5432/mydb`
+
+### Opção 2: Variáveis Individuais
+
+#### `DB_HOST`
+- **Descrição**: Host do servidor PostgreSQL
+- **Tipo**: String
+- **Padrão**: `localhost`
+- **Exemplo**: `DB_HOST=localhost`
+
+#### `DB_PORT`
+- **Descrição**: Porta do servidor PostgreSQL
+- **Tipo**: Number
+- **Padrão**: `5432`
+- **Exemplo**: `DB_PORT=5432`
+
+#### `DB_USER`
+- **Descrição**: Nome de usuário para autenticação no banco
+- **Tipo**: String
+- **Padrão**: `root`
+- **Exemplo**: `DB_USER=postgres`
+
+#### `DB_PASSWORD`
+- **Descrição**: Senha para autenticação no banco
+- **Tipo**: String
+- **Padrão**: `''` (vazio)
+- **Exemplo**: `DB_PASSWORD=mypassword`
+
+#### `DB_NAME`
+- **Descrição**: Nome do banco de dados
+- **Tipo**: String
+- **Padrão**: `test`
+- **Exemplo**: `DB_NAME=alertapx`
+
+### Configurações Avançadas de Banco
+
+#### `DB_SSL`
+- **Descrição**: Habilita SSL para conexão com banco
+- **Tipo**: Boolean
+- **Valores**: `true`, `false`
+- **Padrão**: `false`
+- **Exemplo**: `DB_SSL=true`
+
+#### `DB_MAX_CONNECTION`
+- **Descrição**: Número máximo de conexões simultâneas no pool
+- **Tipo**: Number
+- **Padrão**: `10`
+- **Exemplo**: `DB_MAX_CONNECTION=20`
+
+## 🔒 Security & Authentication
+
+### `JWT_SECRET`
+- **Descrição**: Chave secreta para assinatura de tokens JWT
+- **Tipo**: String
+- **Obrigatório**: Sim
+- **Recomendação**: Use uma string longa e aleatória
+- **Exemplo**: `JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-random`
+
+### `API_SECRET_KEY`
+- **Descrição**: Chave secreta adicional para segurança da API
+- **Tipo**: String
+- **Exemplo**: `API_SECRET_KEY=your-api-secret-key-for-additional-security`
+
+## 👤 Clerk Integration (Authentication Service)
+
+### `CLERK_SECRET_KEY`
+- **Descrição**: Chave secreta do Clerk para autenticação
+- **Tipo**: String
+- **Formato**: Começa com `sk_test_` ou `sk_live_`
+- **Exemplo**: `CLERK_SECRET_KEY=sk_test_axRZs6wiWtDDUYuJDXIc8GsZLpF2zQkzMXdC3hyHQY`
+
+### `CLERK_WEBHOOK_SECRET`
+- **Descrição**: Segredo para validação de webhooks do Clerk
+- **Tipo**: String
+- **Formato**: Começa com `whsec_`
+- **Exemplo**: `CLERK_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+### `CLERK_PUBLISHABLE_KEY`
+- **Descrição**: Chave pública do Clerk para frontend
+- **Tipo**: String
+- **Formato**: Começa com `pk_test_` ou `pk_live_`
+- **Exemplo**: `CLERK_PUBLISHABLE_KEY=pk_test_Y3VyaW91cy1taW5rLTQ3LmNsZXJrLmFjY291bnRzLmRldiQ`
+
+## 🔄 Redis & Caching
+
+### `REDIS_URL`
+- **Descrição**: URL de conexão com Redis para cache geral
+- **Tipo**: String
+- **Formato**: `redis://host:port`
+- **Exemplo**: `REDIS_URL=redis://localhost:6379`
+
+### `RATE_LIMIT_REDIS_URL`
+- **Descrição**: URL de conexão com Redis para rate limiting
+- **Tipo**: String
+- **Formato**: `redis://host:port`
+- **Exemplo**: `RATE_LIMIT_REDIS_URL=redis://localhost:6379`
+
+### `UPSTASH_REDIS_REST_URL`
+- **Descrição**: URL REST da Upstash Redis (serviço gerenciado)
+- **Tipo**: String
+- **Exemplo**: `UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io`
+
+### `UPSTASH_REDIS_REST_TOKEN`
+- **Descrição**: Token de autenticação para Upstash Redis
+- **Tipo**: String
+- **Exemplo**: `UPSTASH_REDIS_REST_TOKEN=your-token-here`
+
+## ☁️ AWS Services (Optional)
+
+### `AWS_REGION`
+- **Descrição**: Região AWS para serviços da AWS
+- **Tipo**: String
+- **Exemplo**: `AWS_REGION=us-east-1`
+
+### `AWS_ACCESS_KEY_ID`
+- **Descrição**: ID da chave de acesso AWS
+- **Tipo**: String
+- **Exemplo**: `AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE`
+
+### `AWS_SECRET_ACCESS_KEY`
+- **Descrição**: Chave secreta de acesso AWS
+- **Tipo**: String
+- **Exemplo**: `AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
+
+## 💳 Stripe Integration (Payment Processing)
+
+### `STRIPE_SECRET_KEY`
+- **Descrição**: Chave secreta do Stripe para processamento de pagamentos
+- **Tipo**: String
+- **Formato**: Começa com `sk_test_` ou `sk_live_`
+- **Exemplo**: `STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+### `STRIPE_WEBHOOK_SECRET`
+- **Descrição**: Segredo para validação de webhooks do Stripe
+- **Tipo**: String
+- **Formato**: Começa com `whsec_`
+- **Exemplo**: `STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+## 📊 Logging
+
+### `LOG_LEVEL`
+- **Descrição**: Nível de logging da aplicação
+- **Tipo**: String
+- **Valores**: `debug`, `info`, `warn`, `error`
+- **Padrão**: `info`
+- **Exemplo**: `LOG_LEVEL=info`
+
+### `APP_NAME`
+- **Descrição**: Nome da aplicação usado nos logs
+- **Tipo**: String
+- **Padrão**: `api`
+- **Exemplo**: `APP_NAME=alertapx-api`
+
+## 🌐 CORS Configuration
+
+### `CORS_ORIGIN`
+- **Descrição**: Origins permitidas para requisições CORS
+- **Tipo**: String (separado por vírgula)
+- **Formato**: Lista de URLs separadas por vírgula
+- **Exemplo**: `CORS_ORIGIN=http://localhost:3000,https://yourdomain.com`
+
+## 📋 Setup Checklist
+
+### Variáveis Obrigatórias
+- [ ] `PORT`
+- [ ] `NODE_ENV`
+- [ ] `JWT_SECRET`
+- [ ] Configuração de banco (URLs ou variáveis individuais)
+
+### Variáveis Opcionais
+- [ ] `REDIS_URL` (para cache)
+- [ ] `CLERK_*` (se usando Clerk)
+- [ ] `STRIPE_*` (se usando Stripe)
+- [ ] `AWS_*` (se usando AWS)
+- [ ] `CORS_ORIGIN` (para frontend)
+
+### Exemplo de .env Mínimo
+```bash
+PORT=5000
+NODE_ENV=development
+JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-random
+DATABASE_URL_WRITE=postgres://user:password@localhost:5432/alertapx
+CORS_ORIGIN=http://localhost:3000
+```
